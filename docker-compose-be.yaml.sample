@@ -1,0 +1,331 @@
+version: '3'
+services:
+
+
+  settings:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/velmie/wallet-settings:3910fa51f6a7a3e13e6ade5890d24875f481c0af
+    restart: always
+    container_name: settings
+    env_file:
+      - .env
+      - common.env
+    environment:
+      - VELMIE_WALLET_SETTINGS_SERVER_PORT=10308
+      - VELMIE_WALLET_SETTINGS_RPC_PORT=12308
+      - VELMIE_WALLET_SETTINGS_DB_HOST=${WALLET_DB_HOST}
+      - VELMIE_WALLET_SETTINGS_DB_PORT=3306
+      - VELMIE_WALLET_SETTINGS_DB_NAME=wallet-settings
+      - VELMIE_WALLET_SETTINGS_DB_USER=${WALLET_DB_USER}
+      - VELMIE_WALLET_SETTINGS_DB_PASS=${WALLET_DB_PASS}
+
+  users:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/velmie/wallet-users:55cd1dc6c69f20b81f1c0cf8168b178b88bc7e41
+    restart: always
+    container_name: users
+    env_file:
+      - .env
+      - common.env
+    environment:
+      - VELMIE_WALLET_USERS_DB_HOST=${WALLET_DB_HOST}
+      - VELMIE_WALLET_USERS_DB_PORT=3306
+      - VELMIE_WALLET_USERS_DB_NAME=wallet-users
+      - VELMIE_WALLET_USERS_DB_USER=${WALLET_DB_USER}
+      - VELMIE_WALLET_USERS_DB_PASS=${WALLET_DB_PASS}
+      - VELMIE_WALLET_USERS_DB_DRIV=mysql
+      - VELMIE_WALLET_USERS_SERVER_PORT=10308
+      - VELMIE_WALLET_USERS_RPC_PORT=12308
+      - VELMIE_WALLET_USERS_SECRET_KEY_PATH=/users/jwt.pem
+      - VELMIE_WALLET_USERS_PUBLIC_KEY_PATH=/users/jwt.pub
+      - VELMIE_WALLET_USERS_JWT_SIGNING_METHOD=ES512
+    volumes:
+      - ./users:/users
+
+  currencies:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/velmie/wallet-currencies:b9c9110783fa66426ca0eb39634ecf91ff1efd8e
+    restart: always
+    container_name: currencies
+    env_file:
+      - .env
+      - common.env
+    environment:
+      - VELMIE_WALLET_CURRENCIES_DB_DRIV=mysql
+      - VELMIE_WALLET_CURRENCIES_DB_HOST=${WALLET_DB_HOST}
+      - VELMIE_WALLET_CURRENCIES_DB_PORT=3306
+      - VELMIE_WALLET_CURRENCIES_DB_NAME=wallet-currencies
+      - VELMIE_WALLET_CURRENCIES_DB_USER=${WALLET_DB_USER}
+      - VELMIE_WALLET_CURRENCIES_DB_PASS=${WALLET_DB_PASS}
+      - VELMIE_WALLET_CURRENCIES_DB_IS_DEBUG_MODE=true
+      - VELMIE_WALLET_CURRENCIES_PORT=10308
+      - VELMIE_WALLET_CURRENCIES_CORS_METHODS=POST,PUT,GET,PATCH,UPDATE,DELETE
+      - VELMIE_WALLET_CURRENCIES_CORS_ORIGINS=*
+      - VELMIE_WALLET_CURRENCIES_CORS_HEADERS=*
+      - VELMIE_WALLET_CURRENCIES_PROTOBUF_PORT=12308
+
+  accounts:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/velmie/wallet-accounts:9f5f49c334444bb3e4b369acd2d676cee16c5f14
+    restart: always
+    container_name: accounts
+    env_file:
+      - .env
+      - common.env
+    environment:
+      - VELMIE_WALLET_ACCOUNTS_DB_DRIV=mysql
+      - VELMIE_WALLET_ACCOUNTS_DB_HOST=${WALLET_DB_HOST}
+      - VELMIE_WALLET_ACCOUNTS_DB_PORT=3306
+      - VELMIE_WALLET_ACCOUNTS_DB_USER=${WALLET_DB_USER}
+      - VELMIE_WALLET_ACCOUNTS_DB_PASS=${WALLET_DB_PASS}
+      - VELMIE_WALLET_ACCOUNTS_DB_NAME=wallet-accounts
+      - VELMIE_WALLET_ACCOUNTS_DB_IS_DEBUG_MODE=true
+      - VELMIE_WALLET_ACCOUNTS_CORS_HEADERS=*
+      - VELMIE_WALLET_ACCOUNTS_CORS_ORIGINS=*
+      - VELMIE_WALLET_ACCOUNTS_CORS_METHODS=GET,POST,PUT,PATCH,DELETE,OPTIONS
+      - VELMIE_WALLET_ACCOUNTS_PORT=10308
+      - VELMIE_WALLET_ACCOUNTS_PROTOBUF_PORT=12308
+      - VELMIE_WALLET_ACCOUNTS_SCHEDULED_TASKS_SIMULATION_ENABLED=false
+
+  customization:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/velmie/wallet-customization:6b465594074db1b8e59bbaeca86db3c3c8794783
+    restart: always
+    container_name: customization
+    env_file:
+      - .env
+      - common.env
+    environment:
+      - VELMIE_WALLET_CUSTOMIZATION_DB_DRIV=mysql
+      - VELMIE_WALLET_CUSTOMIZATION_DB_HOST=${WALLET_DB_HOST}
+      - VELMIE_WALLET_CUSTOMIZATION_DB_PORT=3306
+      - VELMIE_WALLET_CUSTOMIZATION_DB_USER=${WALLET_DB_USER}
+      - VELMIE_WALLET_CUSTOMIZATION_DB_PASS=${WALLET_DB_PASS}
+      - VELMIE_WALLET_CUSTOMIZATION_DB_NAME=wallet-customization
+
+  files:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/velmie/wallet-files:b5f6c7f81ff9b79a2a3bcd8127a5c794bddb477f
+    restart: always
+    container_name: files
+    env_file:
+      - .env
+      - common.env
+    environment:
+      - VELMIE_WALLET_FILES_DB_PASS=${WALLET_DB_PASS}
+      - VELMIE_WALLET_FILES_DB_USER=${WALLET_DB_USER}
+      - VELMIE_WALLET_FILES_DB_NAME=wallet-files
+      - VELMIE_WALLET_FILES_DB_PORT=3306
+      - VELMIE_WALLET_FILES_DB_HOST=${WALLET_DB_HOST}
+      - VELMIE_WALLET_FILES_DB_DRIV=mysql
+      - VELMIE_WALLET_FILES_CORS_METHODS=GET,POST,PUT,DELETE,OPTIONS
+      - VELMIE_WALLET_FILES_CORS_ORIGINS=*
+      - VELMIE_WALLET_FILES_CORS_HEADERS=*
+      - VELMIE_WALLET_FILES_PROTO_BUF_PORT=12308
+      - VELMIE_WALLET_FILES_PORT=10308
+      - VELMIE_WALLET_FILES_STORAGE=s3
+      - VELMIE_WALLET_FILES_AWS_S3_BUCKET=${WALLET_FILES_AWS_S3_BUCKET}
+      - VELMIE_WALLET_FILES_AWS_REGION=${WALLET_FILES_AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${WALLET_FIELS_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${WALLET_FIELS_AWS_SECRET_ACCESS_KEY}
+
+  logs:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/velmie/wallet-logs:0166d224c5c248539abdaf1b717b62ef778b7178
+    restart: always
+    container_name: logs
+    env_file:
+      - .env
+      - common.env
+    environment:
+      - VELMIE_WALLET_LOGS_DB_HOST=${WALLET_DB_HOST}
+      - VELMIE_WALLET_LOGS_DB_PORT=3306
+      - VELMIE_WALLET_LOGS_DB_NAME=wallet-logs
+      - VELMIE_WALLET_LOGS_DB_USER=${WALLET_DB_USER}
+      - VELMIE_WALLET_LOGS_DB_PASS=${WALLET_DB_PASS}
+      - VELMIE_WALLET_LOGS_DB_DRIV=mysql
+      - VELMIE_WALLET_LOGS_DB_IS_DEBUG_MODE=true
+      - VELMIE_WALLET_LOGS_PORT=10308
+      - VELMIE_WALLET_LOGS_CORS_METHODS=POST,PUT,GET,PATCH,UPDATE,DELETE,OPTIONS
+      - VELMIE_WALLET_LOGS_CORS_ORIGINS=*
+      - VELMIE_WALLET_LOGS_CORS_HEADERS=*
+      - VELMIE_WALLET_LOGS_PROTOBUF_PORT=12308
+
+  messages:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/velmie/wallet-messages:cc2d184a57a08b829cf87be45502e5d4d6613c8b
+    restart: always
+    container_name: messages
+    env_file:
+      - .env
+      - common.env
+    environment:
+      - VELMIE_WALLET_MESSAGES_DB_PASS=${WALLET_DB_PASS}
+      - VELMIE_WALLET_MESSAGES_DB_USER=${WALLET_DB_USER}
+      - VELMIE_WALLET_MESSAGES_DB_NAME=wallet-messages
+      - VELMIE_WALLET_MESSAGES_DB_PORT=3306
+      - VELMIE_WALLET_MESSAGES_DB_HOST=${WALLET_DB_HOST}
+      - VELMIE_WALLET_MESSAGES_DB_DRIV=mysql
+      - VELMIE_WALLET_MESSAGES_DB_IS_DEBUG_MODE=true
+      - VELMIE_WALLET_MESSAGES_CORS_HEADERS=*
+      - VELMIE_WALLET_MESSAGES_CORS_ORIGINS=*
+      - VELMIE_WALLET_MESSAGES_CORS_METHODS=GET,POST,PUT,DELETE,OPTIONS
+      - VELMIE_WALLET_MESSAGES_PROTO_BUF_PORT=12308
+      - VELMIE_WALLET_MESSAGES_PORT=10308
+
+  notifications:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/velmie/wallet-notifications:e37941c1b65a7db0265b8b1f7ea2cd31f086e144
+    restart: always
+    container_name: notifications
+    env_file:
+      - .env
+      - common.env
+    environment:
+      - VELMIE_WALLET_NOTIFICATIONS_DB_HOST=${WALLET_DB_HOST}
+      - VELMIE_WALLET_NOTIFICATIONS_DB_PORT=3306
+      - VELMIE_WALLET_NOTIFICATIONS_DB_NAME=wallet-notifications
+      - VELMIE_WALLET_NOTIFICATIONS_DB_USER=${WALLET_DB_USER}
+      - VELMIE_WALLET_NOTIFICATIONS_DB_PASS=${WALLET_DB_PASS}
+      - VELMIE_WALLET_NOTIFICATIONS_DB_DRIV=mysql
+      - VELMIE_WALLET_NOTIFICATIONS_SERVER_PORT=10308
+      - VELMIE_WALLET_NOTIFICATIONS_RPC_PORT=12308
+
+  permissions:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/velmie/wallet-permissions:d0a2e2f4de749feb4591606d06928fb9abbcef3b
+    restart: always
+    container_name: permissions
+    env_file:
+      - .env
+      - common.env
+    environment:
+      - VELMIE_WALLET_PERMISSIONS_DB_HOST=${WALLET_DB_HOST}
+      - VELMIE_WALLET_PERMISSIONS_DB_PORT=3306
+      - VELMIE_WALLET_PERMISSIONS_DB_USER=${WALLET_DB_USER}
+      - VELMIE_WALLET_PERMISSIONS_DB_PASS=${WALLET_DB_PASS}
+      - VELMIE_WALLET_PERMISSIONS_DB_NAME=wallet-permissions
+      - VELMIE_WALLET_PERMISSIONS_DB_DRIV=mysql
+      - VELMIE_WALLET_PERMISSIONS_CORS_METHODS=GET,POST,DELETE,OPTIONS
+      - VELMIE_WALLET_PERMISSIONS_CORS_ORIGINS=*
+      - VELMIE_WALLET_PERMISSIONS_CORS_HEADERS=*
+      - VELMIE_WALLET_PERMISSIONS_PORT=10308
+      - VELMIE_WALLET_PERMISSIONS_RPC_PORT=12308
+
+  kyc:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/velmie/wallet-kyc:380f156de97adc645f087092813761cd6092f51b
+    restart: always
+    container_name: kyc
+    env_file:
+      - .env
+      - common.env
+    environment:
+      - VELMIE_WALLET_KYC_DB_HOST=${WALLET_DB_HOST}
+      - VELMIE_WALLET_KYC_DB_PORT=3306
+      - VELMIE_WALLET_KYC_DB_USER=${WALLET_DB_USER}
+      - VELMIE_WALLET_KYC_DB_PASS=${WALLET_DB_PASS}
+      - VELMIE_WALLET_KYC_DB_NAME=wallet-kyc
+      - ZONEINFO=/app/zoneinfo.zip
+      - VELMIE_WALLET_KYC_PROTOBUF_PORT=12308
+      - VELMIE_WALLET_KYC_PORT=10308
+      - VELMIE_WALLET_KYC_CORS_METHODS=POST,PUT,GET,PATCH,UPDATE,DELETE,OPTIONS
+      - VELMIE_WALLET_KYC_CORS_ORIGINS=*
+      - VELMIE_WALLET_KYC_CORS_HEADERS=Accept,Accept-Language,Content-Language,Content-Type,Authorization
+    depends_on:
+      - users
+      - logs
+      - permissions
+
+  reports:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/velmie/wallet-reports:33826e31f1569489d84fbebc144585d60f30aa73
+    restart: always
+    container_name: reports
+    env_file:
+      - .env
+      - common.env
+    environment:
+      - VELMIE_WALLET_USERS_DB_PASS=${WALLET_DB_PASS}
+      - VELMIE_WALLET_USERS_DB_USER=${WALLET_DB_USER}
+      - VELMIE_WALLET_USERS_DB_NAME=wallet-users
+      - VELMIE_WALLET_USERS_DB_PORT=3306
+      - VELMIE_WALLET_USERS_DB_HOST=${WALLET_DB_HOST}
+      - VELMIE_WALLET_USERS_DB_DRIV=mysql
+      - VELMIE_WALLET_ACCOUNTS_DB_PASS=${WALLET_DB_PASS}
+      - VELMIE_WALLET_ACCOUNTS_DB_USER=${WALLET_DB_USER}
+      - VELMIE_WALLET_ACCOUNTS_DB_NAME=wallet-accounts
+      - VELMIE_WALLET_ACCOUNTS_DB_PORT=3306
+      - VELMIE_WALLET_ACCOUNTS_DB_HOST=${WALLET_DB_HOST}
+      - VELMIE_WALLET_ACCOUNTS_DB_DRIV=mysql
+      - VELMIE_WALLET_CURRENCIES_DB_PASS=${WALLET_DB_PASS}
+      - VELMIE_WALLET_CURRENCIES_DB_USER=${WALLET_DB_USER}
+      - VELMIE_WALLET_CURRENCIES_DB_NAME=wallet-currencies
+      - VELMIE_WALLET_CURRENCIES_DB_PORT=3306
+      - VELMIE_WALLET_CURRENCIES_DB_HOST=${WALLET_DB_HOST}
+      - VELMIE_WALLET_CURRENCIES_DB_DRIV=mysql
+      - VELMIE_WALLET_SETTINGS_DB_HOST=${WALLET_DB_HOST}
+      - VELMIE_WALLET_SETTINGS_DB_PORT=3306
+      - VELMIE_WALLET_SETTINGS_DB_PASS=${WALLET_DB_PASS}
+      - VELMIE_WALLET_SETTINGS_DB_USER=${WALLET_DB_USER}
+      - VELMIE_WALLET_SETTINGS_DB_NAME=wallet-settings
+      - VELMIE_WALLET_SETTINGS_DB_DRIV=mysql
+
+  ingress:
+    image: nginx:1.17.8
+    container_name: ingress
+    restart: "always"
+    #    ports:
+    #      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/services.conf:/etc/nginx/services.conf:ro
+      - ./nginx/common_api_headers.conf:/etc/nginx/common_api_headers.conf:ro
+    depends_on:
+      - accounts
+      - currencies
+      - customization
+      - files
+      - logs
+      - messages
+      - notifications
+      - permissions
+      - reports
+      - settings
+      - users
+      - kyc
+    env_file:
+      - .env
+    environment:
+      - VIRTUAL_HOST=${LETSENCRYPT_BACKEND_VIRTUAL_HOST}
+      - LETSENCRYPT_HOST=${LETSENCRYPT_BACKEND_VIRTUAL_HOST}
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy:latest
+    container_name: nginx-proxy
+    restart: always
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - vhostd:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - certs:/etc/nginx/certs:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  nginx-proxy-letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion:latest
+    container_name: nginx-proxy-letsencrypt
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - certs:/etc/nginx/certs
+      - vhostd:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+    depends_on:
+      - nginx-proxy
+    env_file:
+      - .env
+    environment:
+      - DEFAULT_EMAIL=${LETSENCRYPT_EMAIL}
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+
+volumes:
+  certs:
+  html:
+  vhostd:
+
+networks:
+  default:
+    external:
+      name: wallet
